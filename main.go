@@ -44,10 +44,10 @@ func translate(term string) string {
 
 	if result.Len() == 0 {
 		return ""
-	} else {
-		r := result.String()
-		return r[:len(r)-1]
 	}
+
+	r := result.String()
+	return r[:len(r)-1]
 }
 
 func main() {
