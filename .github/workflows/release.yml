@@ -14,19 +14,38 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: debug if needed
+        run: |
+          export DEBUG=${DEBUG:-false}
+          if [[ "$DEBUG" == "true" ]]; then
+            env
+          fi
+        env:
+          DEBUG: ${{secrets.DEBUG}}
+
       - name: Set up Go
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
 
-      - name: Lint Go Code
+      - name: build and test
         run: |
-          export PATH=$PATH:$(go env GOPATH)/bin # temporary fix. See https://github.com/actions/setup-go/issues/14
-          go get -u golang.org/x/lint/golint
-          make lint
+          echo $TZ
+          go test -mod=vendor -timeout=60s -covermode=count -coverprofile=$GITHUB_WORKSPACE/profile.cov ./...
+        env:
+          TZ: US/Eastern
 
-      - name: Run tests and build
-        run: make test build
+      - name: install golangci-lint
+        run: |
+          curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $GITHUB_WORKSPACE v1.23.1
+
+      - name: run linters
+        run: ./golangci-lint run --config ./.golangci.yml ./... ;
+
+      - name: upload coverage
+      - uses: shogo82148/actions-goveralls@v1
+        with:
+          path-to-profile: $GITHUB_WORKSPACE/profile.cov
 
   release:
     name: Semantic release
