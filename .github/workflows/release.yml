@@ -31,7 +31,7 @@ jobs:
       - name: build and test
         run: |
           echo $TZ
-          go test -mod=vendor -timeout=60s -covermode=count -coverprofile=$GITHUB_WORKSPACE/profile.cov ./...
+          go test -timeout=60s -covermode=count -coverprofile=$GITHUB_WORKSPACE/profile.cov ./...
         env:
           TZ: US/Eastern
 
@@ -89,3 +89,11 @@ jobs:
 
       - name: build image
         run:  docker build --build-arg SKIP_TEST=true --build-arg CI=github .
+
+      - name: Publish
+        uses: mr-smithers-excellent/docker-build-push@v2
+        with:
+          image: otanikotani/gorzenetes
+          tag: latest
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
