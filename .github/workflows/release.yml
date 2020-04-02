@@ -31,7 +31,7 @@ jobs:
       - name: build and test
         run: |
           echo $TZ
-          go test -timeout=60s -covermode=count -coverprofile=$GITHUB_WORKSPACE/profile.cov ./...
+          go test -timeout=60s -covermode=count -coverprofile=profile.cov ./...
         env:
           TZ: US/Eastern
 
@@ -45,7 +45,7 @@ jobs:
       - name: upload coverage
         uses: shogo82148/actions-goveralls@v1
         with:
-          path-to-profile: $GITHUB_WORKSPACE/profile.cov
+          path-to-profile: profile.cov
 
   release:
     name: Semantic release
