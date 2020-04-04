@@ -12,13 +12,17 @@ WORKDIR /app
 
 # run tests
 RUN go test -timeout=30s  ./...
-RUN go build -a -installsuffix cgo -o gorzenetes ./app && ls -la
+RUN go build -a -installsuffix cgo -o gorzenetes ./app && ls -la app/
 
 # Run
-FROM scratch
+# Start a new stage from scratch
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
 
 COPY --from=build /app/gorzenetes ./
+COPY --from=build /app/art.txt ./
 
-EXPOSE 80
+EXPOSE 8080
 
-CMD ["/gorzenetes", "-bind", ":80"]
+CMD ["/gorzenetes", "-bind", ":8080"]

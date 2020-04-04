@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -31,6 +32,17 @@ func morze(c web.C, w http.ResponseWriter, _ *http.Request) {
 	_, _ = fmt.Fprint(w, code)
 }
 
+func gopher(c web.C, w http.ResponseWriter, _ *http.Request) {
+	content, err := ioutil.ReadFile("art.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	// Convert []byte to string and print to screen
+	art := string(content)
+	_, _ = fmt.Fprint(w, art)
+}
+
 func translate(term string) string {
 	var result strings.Builder
 	for _, c := range term {
@@ -51,6 +63,7 @@ func translate(term string) string {
 }
 
 func main() {
+	goji.Get("/gopher", gopher)
 	goji.Get("/:term", morze)
 	goji.Serve()
 }
